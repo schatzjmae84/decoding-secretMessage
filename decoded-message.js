@@ -10,20 +10,20 @@ async function fetchDecodedMessage(url) {
             throw new Error(`HTTP error! status: ${response.status}`); 
         }
 
-        // Parse the HTML content with Cheerio
+        // Load the HTML into cheerio for parsing
         const html = await response.text();
         const $ = load(html);
 
-        // Variables to track grid size and entries
+        // Initialize variables to track max coordinates and entries
         let maxX = 0;
         let maxY = 0;
         const entries = [];  // Array to hold {x, y, char} objects
 
-        // Iterate over each table row to extract coordinates and characters
-        $("table tr").each((i, row) => {
+        // Parse table rows for entries
+        $("table tr").each((_i, row) => {
             const cells = $(row).find("td");
 
-            // Ensure there are exactly 3 cells (x, y, char)
+            // Ensure there are exactly 3 cells in each row (x, y, char)
             if (cells.length === 3) {
                 const x = parseInt($(cells[0]).text().trim(), 10);
                 const char = $(cells[1]).text().trim();
@@ -45,7 +45,7 @@ async function fetchDecodedMessage(url) {
             Array(maxX + 1).fill(" ")
         );
 
-        // Place characters in the grid based on their coordinates
+        // Populate the grid with characters from entries (considering y=0 at bottom)
         entries.forEach(({ x, y, char }) => {
             grid[maxY-y][x] = char;
         });
@@ -62,6 +62,6 @@ async function fetchDecodedMessage(url) {
     }
 }
 
-const url = 'https://docs.google.com/document/d/e/2PACX-1vTMOmshQe8YvaRXi6gEPKKlsC6UpFJSMAk4mQjLm_u1gmHdVVTaeh7nBNFBRlui0sTZ-snGwZM4DBCT/pub';
+const url = 'https://docs.google.com/document/d/e/2PACX-1vRPzbNQcx5UriHSbZ-9vmsTow_R6RRe7eyAU60xIF9Dlz-vaHiHNO2TKgDi7jy4ZpTpNqM7EvEcfr_p/pub';
 fetchDecodedMessage(url);
 
